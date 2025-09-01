@@ -370,7 +370,7 @@ with tabs[1]:
     df_sample = df.head(10).to_csv(index=False)
     load_dotenv()
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-    MODEL = "llama3-70b-8192"
+    MODEL = "llama-3.1-8b-instant"
     GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
     query = st.text_area("Ask your inventory question:")
