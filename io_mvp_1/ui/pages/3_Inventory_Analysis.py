@@ -8,6 +8,7 @@ import requests
 from io import BytesIO
 from dotenv import load_dotenv
 import os
+import math
 
 # --- Page Setup ---
 st.set_page_config(page_title="Unified Inventory Dashboard", layout="wide")
@@ -151,6 +152,7 @@ with tabs[0]:
     # --- Safety Stock Calculation ---
     df_filtered["Daily Demand StdDev"] = df_filtered["Avg Daily Demand"] * 0.5  # Assume 50% coefficient of variation
     df_filtered["Safety Stock"] = Z * df_filtered["Daily Demand StdDev"] * np.sqrt(df_filtered["Average Lead Time"])
+    df_filtered["Safety Stock"] = np.ceil(df_filtered["Safety Stock"]).astype(int)
 
     # --- Total Coverage and Demand ---
     df_filtered["Total Coverage"] = df_filtered["Current Stock Quantity"] + df_filtered["Safety Stock"]
@@ -219,7 +221,10 @@ with tabs[0]:
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Current Stock", f"{int(sku_row['Current Stock Quantity'])}")
     col2.metric("Total Demand (Year)", f"{int(sku_row['Order Quantity sum'])}")
-    col3.metric("Safety Stock", f"{sku_row['Safety Stock']:.2f}")
+    col3.metric(
+    "Safety Stock",
+    f"{math.ceil(sku_row['Safety Stock'])}"
+    )
     col4.metric("Lead Time (Days)", f"{sku_row['Average Lead Time']}")
     # --- Stock Status Gauge ---
  
@@ -573,7 +578,6 @@ with tabs[2]:
                 "Current Stock Quantity",
                 "Days Since Last Movement",
                 "Inactivity Bucket",
-                "Movement Category"
             ]
             if "ABC-XYZ Class" in df_inact_filtered.columns:
                 display_cols.append("ABC-XYZ Class")
